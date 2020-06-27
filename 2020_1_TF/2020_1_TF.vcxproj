@@ -139,19 +139,11 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="App.h">
-      <FileType>CppForm</FileType>
-    </ClInclude>
-    <ClInclude Include="Arbol.h" />
-    <ClInclude Include="Tabla.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="stdafx.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="app.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="2020_1_TF.cpp" />
+    <ClCompile Include="Archivos.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -164,9 +156,10 @@
     <Image Include="app.ico" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="App.resx">
-      <DependentUpon>App.h</DependentUpon>
-    </EmbeddedResource>
+    <ClInclude Include="App.h" />
+    <ClInclude Include="Arbol.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Tabla.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

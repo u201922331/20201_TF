@@ -106,8 +106,16 @@ public:
 		columnas = temp;
 	}
 
-	Columna* getColumna(int i) { return columnas[i]; }
+	Columna* getColumna(std::string nombreColumna) {
+		for (int i = 0; i < num_columnas; i++) {
+			if (columnas[i]->getNombreColumna() == nombreColumna)
+				return columnas[i];
+		}
+		return new Columna;
+	}
 	int getNumColumnas() { return num_columnas; }
 };
+
+#include "Archivos.cpp"
 
 #endif
