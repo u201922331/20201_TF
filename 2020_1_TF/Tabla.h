@@ -17,6 +17,11 @@ typedef Arbol<char> chrTree;
 typedef Arbol<int> intTree;
 typedef Arbol<float> flTree;
 
+typedef std::vector<std::string> strVec;
+typedef std::vector<char> chrVec;
+typedef std::vector<int> intVec;
+typedef std::vector<float> flVec;
+
 // Metodos de impresion de datos del arbol -----------------------------------------------------
 auto print_string = [](std::string x) {std::cout << x << " "; };
 auto print_char = [](char x) {std::cout << x << " "; };
@@ -27,11 +32,19 @@ class Columna {
 	std::string nombre_columna;
 	int tipo_dato;
 
+	int num_filas = 0;
+
 	// Al final solo se usará uno de estos árboles dependiendo que tipo de dato sea el elegido
 	strTree* datos_string;
 	chrTree* datos_char;
 	intTree* datos_int;
 	flTree* datos_float;
+
+	// Vectores
+	strVec* vec_string;
+	chrVec* vec_char;
+	intVec* vec_int;
+	flVec* vec_float;
 
 public:
 	Columna() {}
@@ -39,32 +52,50 @@ public:
 		switch (tag) {
 		case ALFANUMERICO:
 			datos_string = new strTree;
+			vec_string = new strVec;
 			break;
 		case CARACTER:
 			datos_char = new chrTree;
+			vec_char = new chrVec;
 			break;
 		case NUMERICO:
 			datos_int = new intTree;
+			vec_int = new intVec;
 			break;
 		case DECIMAL:
 			datos_float = new flTree;
+			vec_float = new flVec;
 			break;
 		}
 	}
-	~Columna() { delete datos_string, datos_char, datos_int, datos_float; }
+	~Columna() {
+		delete datos_string, datos_char, datos_int, datos_float;
+		delete vec_string, vec_char, vec_int, vec_float;
+	}
 
 	std::string getNombreColumna() { return nombre_columna; }
 	void setNombreColumna(std::string nombre) { nombre_columna = nombre; }
+
+	int getTagColumna() { return tipo_dato; }
+
+	int getNumFilas() { return num_filas; }
 
 	strTree* getArbol_String() { return datos_string; }
 	chrTree* getArbol_Char() { return datos_char; }
 	intTree* getArbol_Int() { return datos_int; }
 	flTree* getArbol_Float() { return datos_float; }
 
+	strVec* getVec_String() { return vec_string; }
+	chrVec* getVec_Char() { return vec_char; }
+	intVec* getVec_Int() { return vec_int; }
+	flVec* getVec_Float() { return vec_float; }
+
 	void Agregar(std::string elem) {
 		switch (tipo_dato) {
 		case ALFANUMERICO:
+			++num_filas;
 			datos_string->Agregar(elem);
+			vec_string->push_back(elem);
 			break;
 		case CARACTER:
 			Agregar(elem[0]);
@@ -77,14 +108,41 @@ public:
 			break;
 		}
 	}
-	void Agregar(char elem) { datos_char->Agregar(elem); }
-	void Agregar(int elem) { datos_int->Agregar(elem); }
-	void Agregar(float elem) { datos_float->Agregar(elem); }
+	void Agregar(char elem) {
+		++num_filas;
+		datos_char->Agregar(elem);
+		vec_char->push_back(elem);
+	}
+	void Agregar(int elem) {
+		++num_filas;
+		datos_int->Agregar(elem);
+		vec_int->push_back(elem);
+	}
+	void Agregar(float elem) {
+		++num_filas;
+		datos_float->Agregar(elem);
+		vec_float->push_back(elem);
+	}
 
-	void Eliminar(std::string elem) {}
-	void Eliminar(char elem) {}
-	void Eliminar(int elem) {}
-	void Eliminar(float elem) {}
+	void Eliminar(std::string elem) {
+		switch (tipo_dato) {
+		case ALFANUMERICO:
+			datos_string->Remover(elem);
+			break;
+		case CARACTER:
+			Eliminar(elem[0]);
+			break;
+		case NUMERICO:
+			Eliminar(std::stoi(elem));
+			break;
+		case DECIMAL:
+			Eliminar(std::stof(elem));
+			break;
+		}
+	}
+	void Eliminar(char elem) { datos_char->Remover(elem); }
+	void Eliminar(int elem) { datos_int->Remover(elem); }
+	void Eliminar(float elem) { datos_float->Remover(elem); }
 };
 
 class Tabla {
@@ -113,9 +171,11 @@ public:
 		}
 		return new Columna;
 	}
+	Columna* getColumna(int n) { return columnas[n]; }
+	
 	int getNumColumnas() { return num_columnas; }
 };
 
-#include "Archivos.cpp"
+#include "Archivos.h"
 
 #endif
