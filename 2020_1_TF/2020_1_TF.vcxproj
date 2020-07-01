@@ -156,11 +156,18 @@
     <Image Include="app.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="App.h" />
+    <ClInclude Include="App.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
     <ClInclude Include="Arbol.h" />
     <ClInclude Include="Archivos.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Tabla.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="App.resx">
+      <DependentUpon>App.h</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
