@@ -31,7 +31,7 @@ auto print_float = [](float x) {std::cout << x << " "; };
 class Columna {
 	std::string nombre_columna;
 	int tipo_dato;
-
+	
 	int num_filas = 0;
 
 	// Al final solo se usará uno de estos árboles dependiendo que tipo de dato sea el elegido
@@ -177,5 +177,5 @@ public:
 };
 
 #include "Archivos.h"
-
+#include "Insercion.h"
 #endif

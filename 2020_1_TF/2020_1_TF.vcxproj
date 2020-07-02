@@ -161,6 +161,7 @@
     </ClInclude>
     <ClInclude Include="Arbol.h" />
     <ClInclude Include="Archivos.h" />
+    <ClInclude Include="Insercion.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Tabla.h" />
   </ItemGroup>

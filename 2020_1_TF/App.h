@@ -1,7 +1,65 @@
 #pragma once
 #include "Tabla.h"
+#include <locale>
 //#include <msclr\marshal_cppstd.h>
 
+bool EsEntero(std::string val) {
+	bool es_num(true);
+	int i = 0;
+
+	for (char c : val) {
+		if (val[0] == '-')
+			if (i > 0 && !isdigit(c))
+				es_num = false;
+		else
+			if (!isdigit(c))
+				es_num = false;
+		
+		if (i != 0 && c == '-' && c == ' ')
+			es_num = false;
+
+		++i;
+	}
+
+	return es_num;
+}
+
+bool EsDecimal(std::string val) {
+	bool es_dec(true);
+	int i = 0;
+	int dot_count = 0;
+
+	for (char c : val) {
+		if (val[0] == '-') {
+			if (c == '.') {
+				++dot_count;
+				if (i == 1) es_dec = false;
+			}
+			else if (i > 0 && !isdigit(c))
+				es_dec = false;
+		}
+		else {
+			if (c == '.') {
+				++dot_count;
+				if (i == 0) es_dec = false;
+			}
+			else if (!isdigit(c))
+				es_dec = false;
+		}
+
+
+		++i;
+	}
+
+	if (dot_count > 1)
+		es_dec = false;
+
+	return es_dec;
+}
+
+bool EsChar(std::string val) { return val.size() == 1; }
+
+// Convertir de System::String a std::string
 void MarshalString(System::String^ msrstr, std::string& stdstr) {
 	using namespace System::Runtime::InteropServices;
 	const char* chars = (const char*)(Marshal::StringToHGlobalAnsi(msrstr)).ToPointer();
@@ -24,11 +82,14 @@ namespace My2020_1_TF {
 	public:
 		App(Tabla* t) {
 			InitializeComponent();
+			
+			// Ajustar la tabla según los datos cargados/ingresados
 			table = t;
 			int num_filas = t->getColumna(0)->getNumFilas();
 			int num_columnas = t->getNumColumnas();
 
 			float porcentaje_primera_fila = 10;
+			float porcentaje_primera_columna = 5;
 
 			this->tabla->RowCount = 0;
 			this->tabla->RowStyles->Clear();
@@ -43,7 +104,16 @@ namespace My2020_1_TF {
 					this->tabla->RowStyles->Add(gcnew RowStyle(SizeType::Percent, 100 / num_filas + porcentaje_primera_fila));
 			this->tabla->ColumnCount = num_columnas;
 			for (int i = 0; i < num_columnas; i++)
-					this->tabla->ColumnStyles->Add(gcnew ColumnStyle(SizeType::Percent, 100 / num_columnas + 10));
+					if (i == 0)
+						this->tabla->ColumnStyles->Add(gcnew ColumnStyle(SizeType::Percent, porcentaje_primera_columna));
+					else
+						this->tabla->ColumnStyles->Add(gcnew ColumnStyle(SizeType::Percent, 100 / num_columnas + porcentaje_primera_columna));
+
+			// Nombres de las columnas para el comboBox
+			this->cmbTipoBusqueda->Items->Clear();
+			for (int i = 0; i < num_columnas; i++) {
+				this->cmbTipoBusqueda->Items->Add(gcnew String(table->getColumna(i)->getNombreColumna().c_str()));
+			}
 		}
 
 	protected:
@@ -64,6 +134,7 @@ namespace My2020_1_TF {
 	private:
 		System::ComponentModel::Container ^components;
 	private: System::Windows::Forms::Button^  btnBuscar;
+	private: System::Windows::Forms::ComboBox^  cmbTipoBusqueda;
 
 
 		Tabla* table;
@@ -78,6 +149,7 @@ namespace My2020_1_TF {
 			this->labelBuscar = (gcnew System::Windows::Forms::Label());
 			this->listResultados = (gcnew System::Windows::Forms::ListBox());
 			this->btnBuscar = (gcnew System::Windows::Forms::Button());
+			this->cmbTipoBusqueda = (gcnew System::Windows::Forms::ComboBox());
 			this->SuspendLayout();
 			// 
 			// tabla
@@ -128,8 +200,7 @@ namespace My2020_1_TF {
 			// listResultados
 			// 
 			this->listResultados->FormattingEnabled = true;
-			this->listResultados->Items->AddRange(gcnew cli::array< System::Object^  >(3) { L"1", L"2", L"3" });
-			this->listResultados->Location = System::Drawing::Point(599, 192);
+			this->listResultados->Location = System::Drawing::Point(599, 155);
 			this->listResultados->Name = L"listResultados";
 			this->listResultados->Size = System::Drawing::Size(173, 95);
 			this->listResultados->TabIndex = 4;
@@ -147,18 +218,32 @@ namespace My2020_1_TF {
 			this->btnBuscar->UseVisualStyleBackColor = true;
 			this->btnBuscar->Click += gcnew System::EventHandler(this, &App::btnBuscar_Click);
 			// 
+			// cmbTipoBusqueda
+			// 
+			this->cmbTipoBusqueda->Anchor = System::Windows::Forms::AnchorStyles::Left;
+			this->cmbTipoBusqueda->DropDownStyle = System::Windows::Forms::ComboBoxStyle::DropDownList;
+			this->cmbTipoBusqueda->Font = (gcnew System::Drawing::Font(L"Consolas", 9.75F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(0)));
+			this->cmbTipoBusqueda->FormattingEnabled = true;
+			this->cmbTipoBusqueda->Location = System::Drawing::Point(599, 126);
+			this->cmbTipoBusqueda->Name = L"cmbTipoBusqueda";
+			this->cmbTipoBusqueda->Size = System::Drawing::Size(121, 23);
+			this->cmbTipoBusqueda->TabIndex = 6;
+			// 
 			// App
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->BackgroundImage = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"$this.BackgroundImage")));
 			this->ClientSize = System::Drawing::Size(784, 461);
+			this->Controls->Add(this->cmbTipoBusqueda);
 			this->Controls->Add(this->btnBuscar);
 			this->Controls->Add(this->listResultados);
 			this->Controls->Add(this->labelBuscar);
 			this->Controls->Add(this->txtbxBuscar);
 			this->Controls->Add(this->lblTabla);
 			this->Controls->Add(this->tabla);
+			this->Icon = (cli::safe_cast<System::Drawing::Icon^>(resources->GetObject(L"$this.Icon")));
 			this->Name = L"App";
 			this->Text = L"App";
 			this->ResumeLayout(false);
@@ -172,33 +257,29 @@ private: System::Void btnBuscar_Click(System::Object^  sender, System::EventArgs
 	std::string buscar;
 	MarshalString(this->txtbxBuscar->Text, buscar);
 
-	this->listResultados->Items->Add(this->txtbxBuscar->Text);
-	/*
-	for (int i = 0; i < table->getNumColumnas(); i++) {
-	switch (table->getColumna(i)->getTagColumna()) {
-	case ALFANUMERICO:
-	if (table->getColumna(i)->getArbol_String()->Busqueda(buscar)) {
-	this->listResultados->Items->Add("Encontrado alfanumerico");
+	int num_coincidencias = 0;
+	int index = this->cmbTipoBusqueda->SelectedIndex;
+
+	if (index >= 0 && index <= table->getNumColumnas()) {
+		switch (table->getColumna(index)->getTagColumna()) {
+		case ALFANUMERICO:
+			num_coincidencias = table->getColumna(index)->getArbol_String()->Coincidencias(buscar);
+			break;
+		case CARACTER:
+			if (EsChar(buscar))
+				num_coincidencias = table->getColumna(index)->getArbol_Char()->Coincidencias(buscar[0]);
+			break;
+		case NUMERICO:
+			if (EsEntero(buscar))
+				num_coincidencias = table->getColumna(index)->getArbol_Int()->Coincidencias(std::stoi(buscar));
+			break;
+		case DECIMAL: 
+			if (EsDecimal(buscar))
+				num_coincidencias = table->getColumna(index)->getArbol_Float()->Coincidencias(std::stof(buscar));
+			break;
+		}
 	}
-	break;
-	case CARACTER:
-	if (table->getColumna(i)->getArbol_Char()->Busqueda(buscar[0])) {
-	this->listResultados->Items->Add("Encontrado caracter");
-	}
-	break;
-	case NUMERICO:
-	if (table->getColumna(i)->getArbol_Int()->Busqueda(std::stoi(buscar))) {
-	this->listResultados->Items->Add("Encontrado numerico");
-	}
-	break;
-	case DECIMAL:
-	if (table->getColumna(i)->getArbol_Float()->Busqueda(std::stof(buscar))) {
-	this->listResultados->Items->Add("Encontrado decimal");
-	}
-	break;
-	}
-	}
-	*/
+	this->listResultados->Items->Add("Se encontraron " + gcnew String(std::to_string(num_coincidencias).c_str()) + " resultados");
 }
 };
 }
