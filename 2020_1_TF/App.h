@@ -1,6 +1,5 @@
 #pragma once
 #include "Tabla.h"
-#include <locale>
 //#include <msclr\marshal_cppstd.h>
 
 bool EsEntero(std::string val) {
@@ -102,8 +101,8 @@ namespace My2020_1_TF {
 					this->tabla->RowStyles->Add(gcnew RowStyle(SizeType::Percent, porcentaje_primera_fila));
 				else
 					this->tabla->RowStyles->Add(gcnew RowStyle(SizeType::Percent, 100 / num_filas + porcentaje_primera_fila));
-			this->tabla->ColumnCount = num_columnas;
-			for (int i = 0; i < num_columnas; i++)
+			this->tabla->ColumnCount = num_columnas + 1;
+			for (int i = 0; i < num_columnas + 1; i++)
 					if (i == 0)
 						this->tabla->ColumnStyles->Add(gcnew ColumnStyle(SizeType::Percent, porcentaje_primera_columna));
 					else

@@ -4,10 +4,10 @@
 #include <conio.h>
 
 // Definir nombre del archivo del que se cargará la tabla
-#define CARGAR  "datos_test_0.txt"
+#define CARGAR  "datos1.txt"
 
 // Definir nombre del archivo donde se guardará la tabla
-#define GUARDAR "datos_1.txt"
+#define GUARDAR "datos1.txt"
 
 using namespace std;
 using namespace System::Windows::Forms;
